@@ -1,0 +1,14 @@
+﻿<Window x:Class="TwitchOverlay.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Overlay" 
+        WindowStyle="None" 
+        WindowState="Maximized" 
+        AllowsTransparency="True" 
+        Background="Transparent" 
+        Topmost="True">
+
+    <Canvas x:Name="RootCanvas" Background="Transparent">
+        <TextBlock x:Name="DeathCounter" Margin="260 50 0 0" Foreground="White" FontSize="30" Text="Morts :" Visibility="Hidden" ></TextBlock>
+    </Canvas>
+</Window>
