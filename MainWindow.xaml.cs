@@ -483,6 +483,11 @@ namespace TwitchOverlay
 			Application.Current.Shutdown();
 		}
 
+		public bool IsDeathCounterVisible()
+		{
+			return DeathCounter.Visibility == Visibility.Visible;
+		}
+
 		public void ShowText()
 		{
 			Dispatcher.Invoke(() =>

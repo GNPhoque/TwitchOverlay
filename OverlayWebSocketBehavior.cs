@@ -20,6 +20,7 @@ public class OverlayWebSocketBehavior : WebSocketBehavior
 
 			Application.Current.Dispatcher.BeginInvoke(new Action(() =>
 			{
+				//PAINT
 				if(command == IniParser.paintOne)
 				{
 					((MainWindow)Application.Current.MainWindow).DrawSplash();
@@ -54,6 +55,8 @@ public class OverlayWebSocketBehavior : WebSocketBehavior
 				{
 					((MainWindow)Application.Current.MainWindow).ClearScreen();
 				}
+
+				//RAID
 				else if (command == IniParser.raid)
 				{
 					for (int i = 0; i < (int)json.value; i++)
@@ -61,6 +64,8 @@ public class OverlayWebSocketBehavior : WebSocketBehavior
 						((MainWindow)Application.Current.MainWindow).DrawSplash();
 					}
 				}
+
+				//DEATH COUNTER
 				else if (command == IniParser.showDeathCounter)
 				{
 					((MainWindow)Application.Current.MainWindow).ShowText();
@@ -72,11 +77,36 @@ public class OverlayWebSocketBehavior : WebSocketBehavior
 				else if (command == IniParser.updateDeathCounter)
 				{
 					string value = json.value;
-					if (!string.IsNullOrEmpty(value))
+					int number = -1;
+
+					if (!string.IsNullOrEmpty(value) && int.TryParse(value, out number))
 					{
 						((MainWindow)Application.Current.MainWindow).UpdateText($"Morts : {value}");
+						if (((MainWindow)Application.Current.MainWindow).IsDeathCounterVisible())
+						{
+							if (number % 100 == 0)
+							{
+								for (int i = 0; i < 100; i++)
+								{
+									((MainWindow)Application.Current.MainWindow).DrawSplash();
+								}
+							}
+							else if (number % 10 == 0)
+							{
+								for (int i = 0; i < 10; i++)
+								{
+									((MainWindow)Application.Current.MainWindow).DrawSplash();
+								}
+							}
+							else
+							{
+								((MainWindow)Application.Current.MainWindow).DrawSplash();
+							}
+						}
 					}
 				}
+
+				//EXIT
 				else if (command == IniParser.exit)
 				{
 					((MainWindow)Application.Current.MainWindow).Shutdown();
