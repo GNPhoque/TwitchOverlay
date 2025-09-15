@@ -106,6 +106,29 @@ public class OverlayWebSocketBehavior : WebSocketBehavior
 					}
 				}
 
+				else if (command == "followHand")
+				{
+					((MainWindow)Application.Current.MainWindow).FollowHand();
+					((MainWindow)Application.Current.MainWindow).ShowImageAtHandPosition(1f, 1f);
+				}
+				else if (command == "unfollowHand")
+				{
+					((MainWindow)Application.Current.MainWindow).UnfollowHand();
+				}
+				else if (command == "handPosition")
+				{
+					float x = (float)json.value.x;
+					float y = (float)json.value.y;
+
+					x -= .1f;
+					x *= 1.1f;
+
+					y -= .1f;
+					y *= 1.1f;
+
+					((MainWindow)Application.Current.MainWindow).ShowImageAtHandPosition(x, y);
+				}
+
 				//EXIT
 				else if (command == IniParser.exit)
 				{

@@ -63,3 +63,4 @@ C:\Users\Jordan\source\repos\TwitchOverlay\bin\Debug\WpfAnimatedGif.xml
 C:\Users\Jordan\source\repos\TwitchOverlay\bin\Debug\cestphoque headbang.gif
 C:\Users\Jordan\source\repos\TwitchOverlay\bin\Debug\phoqueTyping.gif
 C:\Users\Jordan\source\repos\TwitchOverlay\bin\Debug\config.ini
+C:\Users\Jordan\source\repos\TwitchOverlay\bin\Debug\raclette.png

@@ -89,6 +89,11 @@ namespace TwitchOverlay
 			new DisplayImageReference( "phoqueTyping.gif", 1024, 1024, 10, 1),
 		};
 
+		private bool isFollowingHand;
+		private Image handPositionImage;
+		private DisplayImageReference raclette = new DisplayImageReference("raclette.png", 375, 166, 600, 100);
+		private (float x, float y) raclettePosition = (0f, 0f);
+
 		private Random random = new Random();
 		private List<Image> images = new List<Image>();
 		private bool eventsSubcribed;
@@ -114,9 +119,10 @@ namespace TwitchOverlay
 
 		private void FetchImages()
 		{
+			BitmapImage bmp;
+
 			foreach (var item in imageNames)
 			{
-				BitmapImage bmp;
 				// Vérifie si c'est un gif
 				if (item.path.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
 				{
@@ -139,8 +145,10 @@ namespace TwitchOverlay
 					bmp = new BitmapImage(new Uri(item.path, UriKind.Relative));
 					item.image = new AnimatableBitmapImage(bmp);
 				}
-
 			}
+
+			bmp = new BitmapImage(new Uri(raclette.path, UriKind.Relative));
+			raclette.image = new AnimatableBitmapImage(bmp);
 		}
 
 		private void SetupTwitchWebSocket()
@@ -356,9 +364,20 @@ namespace TwitchOverlay
 			}
 		}
 
-		public void DrawSplash()
+		public void DrawSplash(float left = -1, float top = -1)
 		{
-			DisplayImageReference bmp = GetWeightedImage();
+			DisplayImageReference bmp;
+			bool isRaclette = left != -1 && top != -1;
+
+			if (isRaclette)
+			{
+				bmp = raclette;
+			}
+			else
+			{
+				bmp = GetWeightedImage(); 
+			}
+
 			Image image = new Image();
 
 			// Vérifie si c'est un gif
@@ -378,21 +397,36 @@ namespace TwitchOverlay
 			}
 
 			ScaleTransform scaleTransform = new ScaleTransform();
-			scaleTransform.ScaleX = bmp.width/image.Width;
-			scaleTransform.ScaleY = bmp.height/image.Height;
+			scaleTransform.ScaleX = bmp.width / image.Width;
+			scaleTransform.ScaleY = bmp.height / image.Height;
 			TransformGroup transformGroup = new TransformGroup();
-			transformGroup.Children.Add(new RotateTransform(random.Next(0, 360)));
+			if (!isRaclette)
+			{
+				transformGroup.Children.Add(new RotateTransform(random.Next(0, 360)));
+			}
 			transformGroup.Children.Add(scaleTransform);
 			image.RenderTransform = transformGroup;
 
-			// Position aléatoire
-			Canvas.SetLeft(image, random.Next(0 + (int)Math.Round(scaleTransform.ScaleX * image.Width / 2f), (int)SystemParameters.PrimaryScreenWidth - (int)Math.Round(scaleTransform.ScaleX * image.Width / 2f)));
-			Canvas.SetTop(image, random.Next(0 + (int)Math.Round(scaleTransform.ScaleY * image.Height / 2f), (int)SystemParameters.PrimaryScreenHeight - (int)Math.Round(scaleTransform.ScaleY * image.Height / 2f)));
+			if (isRaclette)
+			{
+				Canvas.SetLeft(image, (int)SystemParameters.PrimaryScreenWidth * left);
+				Canvas.SetTop(image, (int)SystemParameters.PrimaryScreenHeight * top);
+				raclettePosition = ((float)SystemParameters.PrimaryScreenWidth * left, (float)SystemParameters.PrimaryScreenHeight * top);
 
-			RootCanvas.Children.Add(image);
-			images.Add(image);
+				RootCanvas.Children.Add(image);
+				handPositionImage = image;
+			}
+			else
+			{
+				// Position aléatoire
+				Canvas.SetLeft(image, random.Next(0 + (int)Math.Round(scaleTransform.ScaleX * image.Width / 2f), (int)SystemParameters.PrimaryScreenWidth - (int)Math.Round(scaleTransform.ScaleX * image.Width / 2f)));
+				Canvas.SetTop(image, random.Next(0 + (int)Math.Round(scaleTransform.ScaleY * image.Height / 2f), (int)SystemParameters.PrimaryScreenHeight - (int)Math.Round(scaleTransform.ScaleY * image.Height / 2f)));
 
-			RemoveSplashAfterDelay(bmp.duration);
+				RootCanvas.Children.Add(image);
+				images.Add(image);
+
+				RemoveSplashAfterDelay(bmp.duration);
+			}
 		}
 
 		private DisplayImageReference GetWeightedImage()
@@ -522,6 +556,43 @@ namespace TwitchOverlay
 				this.Topmost = true;
 			};
 			timer.Start();
+		}
+
+		public void FollowHand()
+		{
+			isFollowingHand = true;
+			if (handPositionImage != null)
+			{
+				handPositionImage.Visibility = Visibility.Visible;
+			}
+		}
+
+		public void UnfollowHand()
+		{
+			isFollowingHand = false;
+			handPositionImage.Visibility = Visibility.Hidden;
+		}
+
+		public void ShowImageAtHandPosition(float left, float top)
+		{
+			if (!isFollowingHand)
+			{
+				return;
+			}
+
+			if(handPositionImage == null)
+			{
+				DrawSplash(left, top);
+			}
+			else
+			{
+				if(Math.Abs(raclettePosition.x - left) < .01f && Math.Abs(raclettePosition.y - top) < .01f)
+				{
+					return;
+				}
+				Canvas.SetLeft(handPositionImage, (int)SystemParameters.PrimaryScreenWidth * left);
+				Canvas.SetTop(handPositionImage, (int)SystemParameters.PrimaryScreenHeight * top);
+			}
 		}
 	}
 }
